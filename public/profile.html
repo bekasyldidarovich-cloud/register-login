@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        padding-top: 10%;
+        transition: all 0.3s ease;
+      }
+      main {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 400px;
+        align-items: center;
+        border: 1px solid rgb(50, 50, 50);
+        border-radius: 20px;
+        justify-content: center;
+        padding-bottom: 3%;
+      }
+      button {
+        width: 50%;
+        height: 25px;
+        border-radius: 10px;
+        border: none;
+        color: white;
+        background-color: blue;
+        cursor: pointer;
+      }
+      main button:hover {
+        opacity: 0.5;
+      }
+      p {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h2>Profile</h2>
+      <p id="name">Loading...</p>
+      <p id="email"></p>
+      <p id="createdAt"></p>
+      <button id="logout">Logout</button>
+    </main>
+
+    <script>
+      const token = localStorage.getItem("token");
+
+      function goToLogin() {
+        localStorage.removeItem("token");
+        window.location.href = "/login.html";
+      }
+
+      async function loadProfile() {
+        if (!token) {
+          goToLogin();
+          return;
+        }
+
+        try {
+          const response = await fetch("/profile", {
+            headers: { Authorization: "Bearer " + token },
+          });
+
+          if (!response.ok) {
+            goToLogin();
+            return;
+          }
+
+          const user = await response.json();
+
+          document.getElementById("name").textContent = "Name: " + user.name;
+          document.getElementById("email").textContent = "Email: " + user.email;
+          document.getElementById("createdAt").textContent =
+            "Registered: " + new Date(user.createdAt).toLocaleDateString();
+        } catch {
+          document.getElementById("name").textContent =
+            "Server is not responding";
+        }
+      }
+
+      document.getElementById("logout").addEventListener("click", goToLogin);
+
+      loadProfile();
+    </script>
+  </body>
+</html>   

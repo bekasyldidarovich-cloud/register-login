@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        padding-top: 10%;
+        transition: all 0.3s ease;
+      }
+      main {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 400px;
+        align-items: center;
+        border: 1px solid rgb(50, 50, 50);
+        border-radius: 20px;
+        justify-content: center;
+        padding-bottom: 3%;
+      }
+      input {
+        height: 20px;
+        border-radius: 5px;
+        border: 2px solid #d8d7d7;
+        text-align: center;
+        width: 50%;
+      }
+      button {
+        width: 50%;
+        height: 25px;
+        border-radius: 10px;
+        border: none;
+        color: white;
+        background-color: blue;
+        cursor: pointer;
+      }
+      main button:hover {
+        opacity: 0.5;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+      }
+      #message {
+        color: red;
+        margin: 0;
+        min-height: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h2>Login</h2>
+      <form id="loginForm">
+        <input
+          type="email"
+          placeholder="Write your email"
+          name="email"
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          name="password"
+          required
+        />
+        <button type="submit">Login</button>
+      </form>
+      <p id="message"></p>
+    </main>
+
+    <script>
+      const form = document.getElementById("loginForm");
+      const message = document.getElementById("message");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        message.textContent = "";
+
+        const data = Object.fromEntries(new FormData(form));
+
+        try {
+          const response = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+          const result = await response.json();
+
+          if (response.ok) {
+            localStorage.setItem("token", result.token);
+            window.location.href = "/profile.html";
+          } else {
+            message.textContent = result.error;
+          }
+        } catch {
+          message.textContent = "Server is not responding";
+        }
+      });
+    </script>
+  </body>
+</html>
